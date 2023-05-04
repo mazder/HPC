@@ -138,8 +138,68 @@ void testArraySum(){
 
 }
 
+// using register pointers
+
+void vectoraddAVX256(){
+    __m256 aRegister = _mm256_set_ps(1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2);
+    __m256 bRegister = _mm256_set_ps(1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2);
+
+    __m256 cRegister = _mm256_add_ps(aRegister,bRegister);
+
+    float *result = (float*)&cRegister;
+
+    for(auto i=0u; i<8; i++){
+        std::cout<<result[i]<<std::endl;
+    }
+
+    // change the value of cRegister using pointer
+    for(auto i=0u; i<8; i++){
+        result[i]=3.2;
+    }
+
+    cRegister = _mm256_add_ps(aRegister,cRegister);
+    for(auto i=0u; i<8; i++){
+        std::cout<<result[i]<<std::endl;
+    }
+
+}
+
+void vectoraddAVX512(){
+    __m512 aRegister = _mm512_set_ps(1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2);
+    __m512 bRegister = _mm512_set_ps(1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2);
+
+    __m512 cRegister = _mm512_add_ps(aRegister,bRegister);
+
+    float *result = (float*)&cRegister;
+
+    for(auto i=0u; i<16; i++){
+        std::cout<<result[i]<<std::endl;
+    }
+
+    // change the value of cRegister using pointer
+    for(auto i=0u; i<16; i++){
+        result[i]=3.2;
+    }
+
+    cRegister = _mm512_add_ps(aRegister,cRegister);
+    for(auto i=0u; i<16; i++){
+        std::cout<<result[i]<<std::endl;
+    }
+
+}
+
+
+
 int main(int argc, char* argv[]){
 
+    //vectoraddAVX256();
+    //vectoraddAVX512();
+
+    if(argc<2){
+        std::cout<<"n args "<<argc<<std::endl;
+        std::cout<<"Run ./simdprogram N // Where X = 32^N +3 "<<std::endl;
+        exit(0);
+    }
     N=atoi(argv[1])*32+3;
     std::cout<<"N= "<<N<<std::endl;
     testArraySum();
