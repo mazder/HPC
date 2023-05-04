@@ -36,7 +36,7 @@ float simdAddAVX512(float* a){
         //std::cout<<sumf16[j]<<std::endl;
         result+=sumf16[j];
     }
-
+    free(sumf16);
     // do the rest
     //std::cout<<result<<std::endl;
     for(;i<N; i++){
@@ -71,7 +71,7 @@ float simdAddAVX256(float* a){
         //std::cout<<sumf8[j]<<std::endl;
         result+=sumf8[j];
     }
-
+    free(sumf8);
     // do the rest
     //std::cout<<result<<std::endl;
     for(;i<N; i++){
@@ -133,6 +133,8 @@ void testArraySum(){
     std::cout<<"Vectorized simd AVX512 sum: "<<sum<<" time: "<<AVX512fTime<<"s"<<std::endl;
 
     std::cout<<"Speed up: "<<(double)scalarTime/AVX512fTime<<"s"<<std::endl;
+
+    free(a);
 
 }
 
