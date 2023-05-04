@@ -16,6 +16,12 @@ void printv(Vector& a){
     }
 }
 
+void print(int* a, int N){
+    for(int i=0; i<N; i++){
+        std::cout<<a[i]<<std::endl;
+    }
+}
+
 Vector xsimdAlignedVectorMean(Vector& a, Vector& b){
     Vector result(a.size());
 
@@ -77,12 +83,77 @@ void averageXSIMD512(){
 }
 */
 
+void dataTypeAlinedData256(){
+    int N = 17;
+    int *vA = (int*) aligned_alloc(sizeof(__m256i),sizeof(int)*N);
+    int *vB = (int*) aligned_alloc(sizeof(__m256i),sizeof(int)*N);
+    int *vC = (int*) aligned_alloc(sizeof(__m256i),sizeof(int)*N);
+
+    // initialize
+    for(int i=0; i<N; i++){
+        vA[i]=1;
+        vB[i]=1;
+    }
+
+    int avx2_size = 8;
+    int vectorizableSample = (N/avx2_size)*avx2_size;
+    int i=0;
+    for( ; i<vectorizableSample; i+=avx2_size){
+        __m256i aRegister = _mm256_load_si256((__m256i *)&vA[i]);
+        __m256i bRegister = _mm256_load_si256((__m256i *)&vB[i]);
+        __m256i cRegister = _mm256_add_epi32(aRegister,bRegister);
+
+        _mm256_store_si256((__m256i *)&vC[i],cRegister);
+        std::cout<<i<<std::endl;
+    }
+    // do the rest if any
+    for(; i<N; i++){
+        vC[i]=vA[i] ; //+vB[i];
+    }
+    print(vC, N);
+}
+
+void dataTypeAlinedData512(){
+    int N = 17;
+    int *vA = (int*) aligned_alloc(sizeof(__m512i),sizeof(int)*N);
+    int *vB = (int*) aligned_alloc(sizeof(__m512i),sizeof(int)*N);
+    int *vC = (int*) aligned_alloc(sizeof(__m512i),sizeof(int)*N);
+
+    // initialize
+    for(int i=0; i<N; i++){
+        vA[i]=1;
+        vB[i]=1;
+    }
+
+    int avx512_size = 16;
+    int vectorizableSample = (N/avx512_size)*avx512_size;
+    int i=0;
+    for( ; i<vectorizableSample; i+=avx512_size){
+        __m512i aRegister = _mm512_load_si512((__m512i *)&vA[i]);
+        __m512i bRegister = _mm512_load_si512((__m512i *)&vB[i]);
+        __m512i cRegister = _mm512_add_epi32(aRegister,bRegister);
+
+        _mm512_store_si512((__m512i *)&vC[i],cRegister);
+        std::cout<<i<<std::endl;
+    }
+    // do the rest if any
+    for(; i<N; i++){
+        vC[i]=vA[i] ; //+vB[i];
+    }
+    print(vC, N);
+}
+
+
+
 int main(int argc, char* argv[])
 {
     //averageXSIMD256();
     //averageXSIMD512();
 
-    xsimdAlignedVector();
+    //xsimdAlignedVector();
+
+    dataTypeAlinedData256();
+    dataTypeAlinedData512();
 
     return 0;
 }
