@@ -8,6 +8,7 @@ This repository (under construction) represnts the basic functionality of differ
 AVX256, AVX512, XSIMD library
 
 ## MPI ##
+Matrix Multiplication Using MPI_scatterv, MPI_bradcast and MPI_gatherv in C.
 
 ## OpenMP ##
 
