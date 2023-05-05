@@ -5,6 +5,7 @@ This repository (under construction) represnts the basic functionality of differ
 ## CUDA ##
 
 ## SIMD ##
+AVX256, AVX512, XSIMD library
 
 ## MPI ##
 
