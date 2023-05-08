@@ -16,9 +16,58 @@ void falseSharing(){
         a[tid*strid]++;
     }
     std::cout<<tid<<" "<<omp_get_num_threads()<<" "<<i<<std::endl;
-}
+    
     delete[] a;
-
+    #pragma omp critical
+    {
+    
+    }
+    
+    
+    
+    #pragma omp atomic
+    
+    #pragma omp single // implicit barrier, can be used nowait 
+    {
+    
+    }
+    #pragma omp master
+    {
+    
+    }
+    #pragma omp barrier
+    
+    // auto split workload
+    #pragma omp for
+    for(int i=0; i<16; i++){
+    
+    }
+}
+   
+    // auto split workload
+    #pragma omp parallel for
+    for(int i=0; i<16; i++){
+    
+    }
+    #pragma omp parallel for colaspe(2) // 2 loops
+    for(int i=0; i<16; i++){
+        for(int j=0; j<16; j++){
+    
+        }
+    }
+    // reduction
+    int sum=0;
+    #pragma omp parallel for reduction(+:sum) 
+    for(int i=0; i<16; i++){
+        sum+=i;
+    }
+    
+    #pragma omp parallel for schedule (dynamic, 1) num_threads (10)
+    #pragma omp parallel for schedule (static, 1) num_threads (10)
+    
+    
+    
+    
 }
 
 
