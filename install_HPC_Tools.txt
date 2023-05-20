@@ -1,22 +1,7 @@
 # Install Kokkos
-1. Download Spack
-  $git clone https://github.com/mlxd/spack.git
-  $cd spack
-  # set spack environment
-  $source share/spack/setup-env.sh
-  
-  #change the defaul build_stage directory
-  # copy config.yaml so spack-stage will be in ~/.spack
-  #cp ../../config.yaml ./etc/spack/
-  cp ../../config.yaml ~/.spack/
-  # to make sure build_stage directory is ~/.spack/spack-stage
-  #spack config edit config
-  #build_stage:
-  #    - ~/.spack/spack-stage
-  #    - $user_cache_path/stage
-  #  # - $spack/var/spack/stage
- 
- 2. $spack info kokkos
-    $gcc --version
-    spack install kokkos@4.0.01 %gcc@11.3.0 +openmp
- 
+ $git clone https://github.com/kokkos/kokkos.git
+ $cd kokkos
+ $mkdir build
+ $cd build
+ $cmake .. -DCMAKE_CXX_COMPILER=g++ -DCMAKE_INSTALL_PREFIX=/home/mrahman/kokks_install -DKokkos_ENABLE_OPENMP=ON
+ $make && make install 
