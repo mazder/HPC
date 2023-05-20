@@ -1,0 +1,11 @@
+# Install Kokkos
+1. Download Spack
+  $git clone -c feature.manyFiles=true https://github.com/spack/spack.git
+  $cd spack
+  # set spack environment
+  $source share/spack/setup-env.sh
+ 
+ 2. $spack info kokkos
+    $gcc --version
+    spack install kokkos@4.0.01 %gcc@11.3.0 +openmp
+ 
