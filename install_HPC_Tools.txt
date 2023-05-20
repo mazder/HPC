@@ -4,6 +4,17 @@
   $cd spack
   # set spack environment
   $source share/spack/setup-env.sh
+  
+  #change the defaul build_stage directory
+  # copy config.yaml so spack-stage will be in ~/.spack
+  #cp ../../config.yaml ./etc/spack/
+  cp ../../config.yaml ~/.spack/
+  # to make sure build_stage directory is ~/.spack/spack-stage
+  #spack config edit config
+  #build_stage:
+  #    - ~/.spack/spack-stage
+  #    - $user_cache_path/stage
+  #  # - $spack/var/spack/stage
  
  2. $spack info kokkos
     $gcc --version
