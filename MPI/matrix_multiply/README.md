@@ -1,4 +1,4 @@
-# MPI_Matrix_Multipy
+# MPI_Matrix_Multiply
 
 ```
 $mpicc main.c        
