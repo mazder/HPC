@@ -10,7 +10,6 @@
 #include "functions.hpp"
 
 __constant__ int mask_dd[MASKDIM*MASKDIM];
-
 __global__ void convolution_2D_device_constant(int* matrix, int* outmatrix, int H, int W){
 
     int row_H = blockIdx.y*blockDim.y+threadIdx.y;
@@ -94,13 +93,13 @@ void convolution(){
 
 
     // calculate grid dimension
-    int NTHREADS = 8;
+    int NTHREADS = 16;
 
     dim3 dim_block(NTHREADS,NTHREADS);
     dim3 dim_grid( (MATRIX_W+NTHREADS-1/NTHREADS), (MATRIX_H+NTHREADS-1/NTHREADS) );
     t1=std::chrono::high_resolution_clock::now();
-    //convolution_2D_device_global<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W, mask_d);
-    convolution_2D_device_constant<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W);
+    convolution_2D_device_global<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W, mask_d);
+    //convolution_2D_device_constant<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W);
 
     cudaDeviceSynchronize();
     t2=std::chrono::high_resolution_clock::now();
