@@ -34,6 +34,140 @@ __global__ void convolution_2D_device_constant(int* matrix, int* outmatrix, int 
     }
 }
 
+void test(){
+    //int MATRIX_H=5;
+    //int MATRIX_W=7;
+
+    int MATRIX_H = 1 << 10;
+    int MATRIX_W = 1 << 12;
+
+    int MASKD=3;
+
+    //outmatrix dim
+    int OUTMATRIX_H=(MATRIX_H-MASKD+1);
+    int OUTMATRIX_W=(MATRIX_W-MASKD+1);
+
+    // allocate and initialize matrix and mask in host
+    //std::vector<int> matrix(MATRIX_H, MATRIX_W);
+    //init_matrix(matrix.data(), MATRIX_H, MATRIX_W);
+    //int *matrix=malloc(MATRIX_H*MATRIX_W*sizeof(int));
+    int *matrix_h=new int[MATRIX_H*MATRIX_W];
+    init_matrix(matrix_h, MATRIX_H, MATRIX_W);
+    //std::cout<<"=====Matrix"<<std::endl;
+    //print_matrix(matrix_h, MATRIX_H, MATRIX_W);
+
+    int *outmatrix_h=new int[OUTMATRIX_H*OUTMATRIX_W];
+
+    int *mask_h=new int[MASKD*MASKD];
+    init_matrix(mask_h, MASKD, MASKD);
+    //std::cout<<"=====Mask"<<std::endl;
+    //print_matrix(mask_h, MASKD, MASKD);
+
+    auto t1=std::chrono::high_resolution_clock::now();
+    convolution(matrix_h, outmatrix_h, MATRIX_H, MATRIX_W, mask_h,MASKD);
+    auto t2=std::chrono::high_resolution_clock::now();
+    auto duration=std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
+
+    std::cout<<"Host Execution Time::> "<<duration<<"\xc2\xb5s"<<std::endl;
+
+    //std::cout<<"=====Host OutMatrix"<<std::endl;
+    //print_matrix(outmatrix_h, OUTMATRIX_H, OUTMATRIX_W);
+
+
+    // device pointer for matrix and outmatrix
+    int *matrix_d;
+    int *mask_d;
+    int *outmatrix_d;
+
+    int *outmatrix_devicetohost=new int[OUTMATRIX_H*OUTMATRIX_W];
+
+    // matrix and mask size in bytes
+    size_t matrix_bytes = MATRIX_H*MATRIX_W*sizeof(int);
+    size_t mask_bytes = MASKD*MASKD*sizeof(int);
+    size_t outmatrix_bytes = OUTMATRIX_H*OUTMATRIX_W*sizeof(int);
+
+    // allocate in device non-unified memory
+    cudaMalloc(&matrix_d, matrix_bytes);
+    cudaMalloc(&outmatrix_d, outmatrix_bytes);
+    cudaMalloc(&mask_d, mask_bytes);
+
+    // copy matrix and mask in device global memory
+    cudaMemcpy(matrix_d, matrix_h, matrix_bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(mask_d, mask_h, mask_bytes, cudaMemcpyHostToDevice);
+
+
+    // calculate grid dimension
+    int NTHREADS = 16;
+    dim3 dim_block(NTHREADS,NTHREADS);
+    dim3 dim_grid( (OUTMATRIX_W+NTHREADS-1/NTHREADS), (OUTMATRIX_H+NTHREADS-1/NTHREADS) );
+
+    t1=std::chrono::high_resolution_clock::now();
+    convolution_device<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W, mask_d, MASKD);
+
+    cudaDeviceSynchronize();
+    t2=std::chrono::high_resolution_clock::now();
+    duration=std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
+    std::cout<<"Device Execution Time::> "<<duration<<"\xc2\xb5s"<<std::endl;
+
+    cudaMemcpy(outmatrix_devicetohost, outmatrix_d, outmatrix_bytes, cudaMemcpyDeviceToHost);
+
+    //std::cout<<"=====Device OutMatrix"<<std::endl;
+    //print_matrix(outmatrix_devicetohost, OUTMATRIX_H, OUTMATRIX_W);
+
+    if(check_equivalent(outmatrix_h,  OUTMATRIX_H, OUTMATRIX_W, outmatrix_devicetohost)){
+        std::cout<<"Success"<<std::endl;
+    }
+    else{
+        std::cout<<"Failed"<<std::endl;
+    }
+
+    // free host memory
+    delete[] matrix_h;
+    delete[] mask_h;
+    delete[] outmatrix_h;
+    delete[] outmatrix_devicetohost;
+
+    // free cuda memory
+
+    cudaFree(matrix_d);
+    cudaFree(outmatrix_d);
+    cudaFree(mask_d);
+}
+
+
+void host_test(){
+    int MATRIX_H=5;
+    int MATRIX_W=7;
+
+    //int MATRIX_H = 1 << 10;
+    //int MATRIX_W = 1 << 12;
+
+    int MASKD=3;
+
+    // allocate and initialize matrix and mask in host
+    //std::vector<int> matrix(MATRIX_H, MATRIX_W);
+    //init_matrix(matrix.data(), MATRIX_H, MATRIX_W);
+    //int *matrix=malloc(MATRIX_H*MATRIX_W*sizeof(int));
+    int *matrix_h=new int[MATRIX_H*MATRIX_W];
+    init_matrix(matrix_h, MATRIX_H, MATRIX_W);
+    std::cout<<"=====Matrix"<<std::endl;
+    print_matrix(matrix_h, MATRIX_H, MATRIX_W);
+
+    int *outmatrix_h=new int[(MATRIX_H-MASKD+1)*(MATRIX_W-MASKD+1)];
+
+    int *mask_h=new int[MASKD*MASKD];
+    init_matrix(mask_h, MASKD, MASKD);
+    std::cout<<"=====Mask"<<std::endl;
+    print_matrix(mask_h, MASKD, MASKD);
+
+    auto t1=std::chrono::high_resolution_clock::now();
+    convolution(matrix_h, outmatrix_h, MATRIX_H, MATRIX_W, mask_h,MASKD);
+    auto t2=std::chrono::high_resolution_clock::now();
+    auto duration=std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
+    std::cout<<"Host Execution Time::> "<<duration<<"\xc2\xb5s"<<std::endl;
+    std::cout<<"=====Host OutMatrix"<<std::endl;
+    print_matrix(outmatrix_h, (MATRIX_H-MASKD+1), (MATRIX_W-MASKD+1));
+}
 
 void convolution(){
 
@@ -136,8 +270,9 @@ int main(int argc, char *argv[])
 {
 
     std::cout<<"=================Call Convolution======================="<<std::endl;
-    convolution();
-
+    //convolution();
+    //host_test();
+    test();
 
     return 0;
 }

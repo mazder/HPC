@@ -2,6 +2,7 @@
 #include "kernels.cuh"
 
 __device__ void show_matrix(int* matrix, int H, int W){
+    printf("=============\n");
     for(int i=0; i<H; i++){
         for(int j=0; j<W; j++){
             printf("%d ",matrix[i*W+j]);
@@ -32,4 +33,37 @@ __global__ void convolution_2D_device_global(int* matrix, int* outmatrix, int H,
         }
         outmatrix[row_H*W+col_W]=temp;
     }
+}
+
+__global__ void convolution_device(int* matrix, int* outmatrix, int H, int W, int* mask, int MASKD){
+
+
+    int row_H = blockIdx.y*blockDim.y+threadIdx.y;
+    int col_W = blockIdx.x*blockDim.x+threadIdx.x;
+
+    int temp=0;
+    int r_offset;
+    int c_offset;
+    int new_H=(H-MASKD+1);
+    int new_W=(W-MASKD+1);
+
+    // boundary
+    if(row_H<new_H && col_W<new_W){
+        for(int i=row_H; i<MASKD+row_H; i++){
+            r_offset=i-row_H;
+            for(int j=col_W; j<MASKD+col_W; j++){
+                c_offset=j-col_W;
+                temp+=mask[r_offset*MASKD+c_offset]*matrix[i*W+j];
+            }
+        }
+        outmatrix[row_H*new_W+col_W]=temp;
+        //printf("%d %d %d %d \n", row_H, col_W, row_H*new_W+col_W, temp);
+    }
+/*
+    if(row_H==0 && col_W==0){
+        show_matrix(mask, MASKD, MASKD);
+        show_matrix(matrix, H, W);
+        show_matrix(outmatrix, new_H, new_W);
+    }
+*/
 }
