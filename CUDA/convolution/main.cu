@@ -98,8 +98,8 @@ void convolution(){
     dim3 dim_block(NTHREADS,NTHREADS);
     dim3 dim_grid( (MATRIX_W+NTHREADS-1/NTHREADS), (MATRIX_H+NTHREADS-1/NTHREADS) );
     t1=std::chrono::high_resolution_clock::now();
-    convolution_2D_device_global<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W, mask_d);
-    //convolution_2D_device_constant<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W);
+    //convolution_2D_device_global<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W, mask_d);
+    convolution_2D_device_constant<<<dim_grid, dim_block>>>(matrix_d, outmatrix_d, MATRIX_H, MATRIX_W);
 
     cudaDeviceSynchronize();
     t2=std::chrono::high_resolution_clock::now();
