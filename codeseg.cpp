@@ -10,24 +10,13 @@
 #include <chrono>
 #include<cstdlib>
 
-//First Non-Repeating Character
-char firstnonrepeatingchar(const string & s){
-    std::array<int, 256> count{};
-    for (char c : s) { cout[static_cast<uint8_t>(c)]++;}
-    for (char c : s){
-       if count[static_cast<uint8_t>(c)] == 1
-            return c;
-    return '\0';
-}
-
-
-struct Node{
+struct Node {
     int value;
     Node* next;
 
 };
 
-Node* reverse_list(Node* haed){
+Node* reverse_list(Node* head){
     Node* prev = nullptr;
     while(head){
        Node* next = head->next;
@@ -37,7 +26,6 @@ Node* reverse_list(Node* haed){
     }
     return prev;
 }
-
 
 bool hasCycle(Node* head) {
     Node *slow = head, *fast = head;
@@ -49,12 +37,16 @@ bool hasCycle(Node* head) {
     return false;  // Fast reached null = no cycle
 }
 
-
-void norepeating(const string & s){
-
-
+//First Non-Repeating Character
+char firstnonrepeatingchar(const std::string& s){
+    std::array<int, 256> cnt{};
+    for (char c : s) { cnt[static_cast<uint8_t>(c)]++;}
+    for (char c : s){
+       if ( cnt[static_cast<uint8_t>(c)] == 1 )
+            return c;
+    }
+    return '\0';
 }
-
 
 void byteManipulation(){
 
@@ -64,9 +56,7 @@ void byteManipulation(){
 }
 
 void printBytes(uint32_t data){
-
     uint8_t* ptr=reinterpret_cast<uint8_t*>(&data);
-
     for(int i=0; i<4; i++){
         std::printf("%d 0x%02X\n",i, ptr[i]);
     }
