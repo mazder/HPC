@@ -8,7 +8,7 @@
 #include <sstream>
 #include <exception>
 #include <chrono>
-#include<cstdlib.h>
+#include<cstdlib>
 
 //First Non-Repeating Character
 char firstnonrepeatingchar(const string & s){
