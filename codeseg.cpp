@@ -10,6 +10,17 @@
 #include <chrono>
 #include<cstdlib.h>
 
+//First Non-Repeating Character
+char firstnonrepeatingchar(const string & s){
+    std::array<int, 256> count{};
+    for (char c : s) { cout[static_cast<uint8_t>(c)]++;}
+    for (char c : s){
+       if count[static_cast<uint8_t>(c)] == 1
+            return c;
+    return '\0';
+}
+
+
 struct Node{
     int value;
     Node* next;
